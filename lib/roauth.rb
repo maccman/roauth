@@ -8,7 +8,7 @@ module ROAuth
   
   # Supported {signature methods}[http://oauth.net/core/1.0/#signing_process];
   SIGNATURE_METHODS = {"HMAC-SHA1" => OpenSSL::Digest::Digest.new("sha1")}
-  OAUTH_PARAMS      = [:consumer_key, :token, :signature_method, :version, :nonce, :timestamp, :signature]
+  OAUTH_PARAMS      = [:consumer_key, :token, :signature_method, :version, :nonce, :timestamp]
   
   # Return an {OAuth "Authorization" HTTP header}[http://oauth.net/core/1.0/#auth_header] from request data
   def header(oauth, uri, params = {}, http_method = :get)    
@@ -16,25 +16,28 @@ module ROAuth
     oauth[:version]          ||= "1.0" # Assumed version, according to the spec
     oauth[:nonce]            ||= Base64.encode64(OpenSSL::Random.random_bytes(32)).gsub(/\W/, '')
     oauth[:timestamp]        ||= Time.now.to_i
+    oauth[:token]            ||= oauth.delete(:access_key)
+    oauth[:token_secret]     ||= oauth.delete(:access_secret)
     
     sig_params = params.dup
     sig_params.merge!(oauth_params(oauth))
+    sig_params.merge!(:oauth_signature => escape(signature(oauth, uri, sig_params, http_method)))
     
-    oauth.merge!(:signature => signature(oauth, uri, params, http_method))
-    
-    %{OAuth } + oauth_params(oauth).map {|key, value| [key, value].join("=") }.join(", ")
+    %{OAuth } + sig_params.map {|key, value| [key, value].join("=") }.join(", ")
   end
   
   def parse(header)
     header = header.dup
     header = header.gsub!(/^OAuth\s/, "")
     header = header.split(", ")
-    header.inject({}) {|hash, item|
+    header = header.inject({}) {|hash, item|
       key, value = item.split("=")
       key.gsub!(/^oauth_/, "")
       hash[key.to_sym] = unescape(value)
       hash
     }
+    header[:access_key] = header[:token]
+    header
   end
   
   def verify(oauth, header, uri, params = {}, http_method = :get)
@@ -65,6 +68,9 @@ module ROAuth
       sig_base = http_method.to_s.upcase + "&" + escape(uri) + "&" + normalize(params)
       digest   = SIGNATURE_METHODS[oauth[:signature_method]]
       secret   = "#{escape(oauth[:consumer_secret])}&#{escape(oauth[:token_secret])}"
+      
+      puts "Secret: #{secret}"
+      puts "Sigbase: #{sig_base}"
       
       Base64.encode64(OpenSSL::HMAC.digest(digest, secret, sig_base)).chomp.gsub(/\n/, "")
     end

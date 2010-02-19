@@ -8,8 +8,8 @@ Example Client:
 	oauth = {
     :consumer_key    => "consumer_key",
     :consumer_secret => "consumer_secret",
-    :token           => "access_key",
-    :token_secret    => "access_secret"
+    :access_key      => "access_key",
+    :access_secret   => "access_secret"
 	}
 	params = {
 		'count'    => "11",
@@ -23,14 +23,14 @@ Example Client:
 
 Example Server:
   
-	request_oauth = ROAuth.parse(request.header['Authorization'])
+	oauth_header = ROAuth.parse(request.header['Authorization'])
 	
 	# Implementation specific
-	consumer     = Consumer.find_by_key(request_oauth['consumer_key'])
-	access_token = AccessToken.find_by_token(request_oauth['token'])
+	consumer     = Consumer.find_by_key(oauth_header[:consumer_key])
+	access_token = AccessToken.find_by_token(oauth_header[:access_key])
 	oauth = {
 	  :consumer_secret => consumer.secret,
-	  :token_secret    => access_token.secret
+	  :access_secret   => access_token.secret
 	}
 	
-	OAuth.verify(oauth, request.request_uri, request_oauth, params) #=> true/false
+	ROAuth.verify(oauth, oauth_header, request.request_uri, params) #=> true/false
