@@ -9,15 +9,15 @@ Example Client:
     uri = "https://twitter.com/direct_messages.json"
 
     oauth = {
-    :consumer_key    => "consumer_key",
-    :consumer_secret => "consumer_secret",
-    :access_key      => "access_key",
-    :access_secret   => "access_secret"
+      :consumer_key    => "consumer_key",
+      :consumer_secret => "consumer_secret",
+      :access_key      => "access_key",
+      :access_secret   => "access_secret"
     }
 
     params = {
-    :count    => "11",
-    :since_id => "5000"
+      :count    => "11",
+      :since_id => "5000"
     }
     oauth_header = ROAuth.header(oauth, uri, params)
 
