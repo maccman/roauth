@@ -1,4 +1,6 @@
 Based on SOAuth: http://github.com/tofumatt/SOAuth
+
+A *simple* OAuth library that supports OAuth header signing, and header verifying.
   
   gem install roauth
 
