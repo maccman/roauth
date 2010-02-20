@@ -7,12 +7,13 @@ A *simple* OAuth library that supports OAuth header signing, and header verifyin
 Example Client:
 
 	uri = 'https://twitter.com/direct_messages.json'
-  oauth = {
+  
+	oauth = {
     :consumer_key    => "consumer_key",
     :consumer_secret => "consumer_secret",
     :access_key      => "access_key",
     :access_secret   => "access_secret"
-  }
+	}
   
 	params = {
     'count'    => "11",
