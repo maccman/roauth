@@ -69,9 +69,6 @@ module ROAuth
       digest   = SIGNATURE_METHODS[oauth[:signature_method]]
       secret   = "#{escape(oauth[:consumer_secret])}&#{escape(oauth[:token_secret])}"
       
-      puts "Secret: #{secret}"
-      puts "Sigbase: #{sig_base}"
-      
       Base64.encode64(OpenSSL::HMAC.digest(digest, secret, sig_base)).chomp.gsub(/\n/, "")
     end
   
