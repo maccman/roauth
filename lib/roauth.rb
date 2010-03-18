@@ -19,9 +19,10 @@ module ROAuth
     oauth[:token]            ||= oauth.delete(:access_key)
     oauth[:token_secret]     ||= oauth.delete(:access_secret)
     
-    sig_params = params.dup
-    sig_params.merge!(oauth_params(oauth))
-    sig_params.merge!(:oauth_signature => escape(signature(oauth, uri, sig_params, http_method)))
+    sig_params = oauth_params(oauth)
+    sig_params[:oauth_signature] = escape(
+      signature(oauth, uri, sig_params.merge(params), http_method)
+    )
     
     %{OAuth } + sig_params.map {|key, value| [key, value].join("=") }.join(", ")
   end
@@ -44,8 +45,11 @@ module ROAuth
     header = header.is_a?(String) ? parse(header) : header.dup
     
     client_signature = header.delete(:signature)
-    oauth[:consumer_key] ||= header[:consumer_key]
-    oauth[:token]        ||= header[:token]
+    oauth[:consumer_key]     ||= header[:consumer_key]
+    oauth[:token]            ||= header[:token]
+    oauth[:token_secret]     ||= oauth.delete(:access_secret)
+    oauth[:signature_method] ||= "HMAC-SHA1"
+    oauth[:version]          ||= "1.0"
     
     sig_params = params.dup
     sig_params.merge!(oauth_params(header))
