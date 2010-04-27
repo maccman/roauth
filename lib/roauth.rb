@@ -68,7 +68,11 @@ module ROAuth
       }
     end
   
-    def signature(oauth, uri, params, http_method = :get)      
+    def signature(oauth, uri, params, http_method = :get)
+      uri = URI.parse(uri)
+      uri.query = nil
+      uri = uri.to_s
+      
       sig_base = http_method.to_s.upcase + "&" + escape(uri) + "&" + normalize(params)
       digest   = SIGNATURE_METHODS[oauth[:signature_method]]
       secret   = "#{escape(oauth[:consumer_secret])}&#{escape(oauth[:token_secret])}"
@@ -78,11 +82,11 @@ module ROAuth
   
     # Escape characters in a string according to the {OAuth spec}[http://oauth.net/core/1.0/]
     def escape(value)
-      URI::escape(value.to_s, /[^a-zA-Z0-9\-\.\_\~]/) # Unreserved characters -- must not be encoded
+      URI.escape(value.to_s, /[^a-zA-Z0-9\-\.\_\~]/) # Unreserved characters -- must not be encoded
     end
     
     def unescape(value)
-      URI::unescape(value)
+      URI.unescape(value)
     end
   
     # Normalize a string of parameters based on the {OAuth spec}[http://oauth.net/core/1.0/#rfc.section.9.1.1]
