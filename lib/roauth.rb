@@ -88,7 +88,7 @@ module ROAuth
     # Normalize a string of parameters based on the {OAuth spec}[http://oauth.net/core/1.0/#rfc.section.9.1.1]
     def normalize(params)
       # Stringify keys - so we can compare them
-      params.keys.each {|key| params[key.to_s] = delete(key) }
+      params.keys.each {|key| params[key.to_s] = params.delete(key) }
       params.sort.map do |key, values|
         if values.is_a?(Array)
           # Multiple values were provided for a single key
