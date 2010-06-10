@@ -11,7 +11,8 @@ module ROAuth
   OAUTH_PARAMS      = [:consumer_key, :token, :signature_method, :version, :nonce, :timestamp]
   
   # Return an {OAuth "Authorization" HTTP header}[http://oauth.net/core/1.0/#auth_header] from request data
-  def header(oauth, uri, params = {}, http_method = :get)    
+  def header(oauth, uri, params = {}, http_method = :get)
+    oauth = oauth.dup
     oauth[:signature_method] ||= "HMAC-SHA1"
     oauth[:version]          ||= "1.0" # Assumed version, according to the spec
     oauth[:nonce]            ||= Base64.encode64(OpenSSL::Random.random_bytes(32)).gsub(/\W/, '')
