@@ -8,7 +8,7 @@ module ROAuth
   
   # Supported {signature methods}[http://oauth.net/core/1.0/#signing_process];
   SIGNATURE_METHODS = {"HMAC-SHA1" => OpenSSL::Digest::Digest.new("sha1")}
-  OAUTH_PARAMS      = [:consumer_key, :token, :signature_method, :version, :nonce, :timestamp]
+  OAUTH_PARAMS      = [:consumer_key, :token, :signature_method, :version, :nonce, :timestamp, :body_hash, :callback]
   
   # Return an {OAuth "Authorization" HTTP header}[http://oauth.net/core/1.0/#auth_header] from request data
   def header(oauth, uri, params = {}, http_method = :get)
@@ -35,6 +35,7 @@ module ROAuth
     header = header.inject({}) {|hash, item|
       key, value = item.split("=")
       key.gsub!(/^oauth_/, "")
+      value.gsub!(/(^"|"$)/, "")
       hash[key.to_sym] = unescape(value)
       hash
     }
