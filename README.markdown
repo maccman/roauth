@@ -6,7 +6,10 @@ A *simple* OAuth library that supports OAuth header signing, and header verifyin
 
 Example Client:
 
-    uri = "https://twitter.com/direct_messages.json"
+    require "roauth"
+    require "nestful"
+
+    url = "https://twitter.com/direct_messages.json"
 
     oauth = {
       :consumer_key    => "consumer_key",
@@ -19,11 +22,9 @@ Example Client:
       :count    => "11",
       :since_id => "5000"
     }
-    oauth_header = ROAuth.header(oauth, uri, params)
-
-    http_uri = URI.parse(uri)
-    request  = Net::HTTP.new(http_uri.host, http_uri.port)
-    request.get(uri.request_uri, {'Authorization', oauth_header})
+    oauth_header = ROAuth.header(oauth, url, params)
+    
+    Nestful.get(url, :params => params, :headers => {'Authorization' => oauth_header})
 
 Example Server:
 
