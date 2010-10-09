@@ -21,9 +21,7 @@ module ROAuth
     oauth[:token_secret]     ||= oauth.delete(:access_secret)
 
     sig_params = oauth_params(oauth)
-    sig_params[:oauth_signature] = escape(
-      signature(oauth, uri, sig_params.merge(params), http_method)
-      )
+    sig_params[:oauth_signature] = escape(signature(oauth, uri, sig_params.merge(params), http_method))
     sorted_sig_params    = sig_params.sort_by{|k,v| [k.to_s, v.to_s] }
     authorization_params = sorted_sig_params.map {|key, value| [key, "\"#{value}\""].join("=") }.join(", ")
 
@@ -77,9 +75,9 @@ module ROAuth
       uri.query = nil
       uri = uri.to_s
 
-      sig_base = http_method.to_s.upcase + "&" + escape(uri) + "&" + normalize(params)
+      sig_base = [http_method.to_s.upcase, uri, normalize(params)].map{|e| escape(e) }.join("&")
       digest   = SIGNATURE_METHODS[oauth[:signature_method]]
-      secret   = "#{escape(oauth[:consumer_secret])}&#{escape(oauth[:token_secret])}"
+      secret   = oauth.values_at(:consumer_secret, :token_secret).map{|e| escape(e) }.join("&")
 
       Base64.encode64(OpenSSL::HMAC.digest(digest, secret, sig_base)).chomp.gsub(/\n/, "")
     end
@@ -95,19 +93,11 @@ module ROAuth
 
     # Normalize a string of parameters based on the {OAuth spec}[http://oauth.net/core/1.0/#rfc.section.9.1.1]
     def normalize(params)
-      # Stringify keys - so we can compare them
-      params.keys.each {|key| params[key.to_s] = params.delete(key) }
-      params.sort.map do |key, values|
-        if values.is_a?(Array)
-          # Multiple values were provided for a single key
-          # in a hash
-          values.sort.collect do |v|
-            [escape(key), escape(v)] * "%3D"
-          end
-        else
-          [escape(key), escape(values)] * "%3D"
+      params.sort_by(&:to_s).map do |key, values|
+        Array.new(values).map do |value|
+          [escape(key), escape(value)].join("=")
         end
-      end * "%26"
+      end.join("&")
     end
   extend self
 end
