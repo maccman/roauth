@@ -94,7 +94,7 @@ module ROAuth
     # Normalize a string of parameters based on the {OAuth spec}[http://oauth.net/core/1.0/#rfc.section.9.1.1]
     def normalize(params)
       params.sort_by(&:to_s).map do |key, values|
-        Array.new(values).map do |value|
+        Array(values).map do |value|
           [escape(key), escape(value)].join("=")
         end
       end.join("&")
