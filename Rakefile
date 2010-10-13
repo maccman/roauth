@@ -1,3 +1,6 @@
+require 'rubygems'
+require 'rake'
+
 begin
   require 'jeweler'
   Jeweler::Tasks.new do |gemspec|
@@ -9,5 +12,16 @@ begin
     gemspec.authors = ["Alex MacCaw"]
   end
 rescue LoadError
-  puts "Jeweler not available. Install it with: sudo gem install technicalpickles-jeweler -s http://gems.github.com"
+  puts "Jeweler not available. Install it with: sudo gem install jeweler"
 end
+
+
+require 'rake/testtask'
+Rake::TestTask.new(:test) do |test|
+  test.libs << 'lib' << 'test'
+  test.pattern = 'test/**/test_*.rb'
+  test.verbose = true
+end
+
+task :test => :check_dependencies
+task :default => :test
