@@ -20,7 +20,6 @@ class TestRoauth < Test::Unit::TestCase
     
     oauth_header = ROAuth.header(oauth, url, params)
     signature    = ROAuth.parse(oauth_header)[:signature]
-    puts oauth_header
         
     assert_equal "9/g1ge6nLYVkBsTEqgxH0Xlv2O4=", signature
   end
