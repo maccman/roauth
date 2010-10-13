@@ -20,8 +20,9 @@ class TestRoauth < Test::Unit::TestCase
     
     oauth_header = ROAuth.header(oauth, url, params)
     signature    = ROAuth.parse(oauth_header)[:signature]
+    puts oauth_header
         
-    assert_equal "7/y7qmvtcOGo7sI0z1IY4WILZso=", signature
+    assert_equal "9/g1ge6nLYVkBsTEqgxH0Xlv2O4=", signature
   end
   
   should "verify correctly signed params" do 
@@ -41,8 +42,7 @@ class TestRoauth < Test::Unit::TestCase
       :since_id => "5000"
     }
     
-    header = %{OAuth oauth_consumer_key="consumer_key", oauth_nonce="foo", oauth_signature="7%2Fy7qmvtcOGo7sI0z1IY4WILZso%3D", oauth_signature_method="HMAC-SHA1", oauth_timestamp="1286967499", oauth_token="access_key", oauth_version="1.0"}
-    
+    header = %{OAuth oauth_consumer_key="consumer_key", oauth_nonce="foo", oauth_signature="9%2Fg1ge6nLYVkBsTEqgxH0Xlv2O4%3D", oauth_signature_method="HMAC-SHA1", oauth_timestamp="1286967499", oauth_token="access_key", oauth_version="1.0"}
     assert ROAuth.verify(oauth, header, url, params), "verify failed"
   end
 end
