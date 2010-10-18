@@ -77,7 +77,7 @@ module ROAuth
       uri.query = nil
       uri = uri.to_s
 
-      sig_base = http_method.to_s.upcase + "&" + escape(uri) + "&" + normalize(params)
+      sig_base = http_method.to_s.upcase + "&" + escape(uri) + "&" + escape(normalize(params))
       digest   = SIGNATURE_METHODS[oauth[:signature_method]]
       secret   = "#{escape(oauth[:consumer_secret])}&#{escape(oauth[:token_secret])}"
 
@@ -97,17 +97,17 @@ module ROAuth
     def normalize(params)
       # Stringify keys - so we can compare them
       params.keys.each {|key| params[key.to_s] = params.delete(key) }
-      params.sort.map do |key, values|
+      params.sort_by {|key, values| key.to_s }.map do |key, values|
         if values.is_a?(Array)
           # Multiple values were provided for a single key
           # in a hash
-          values.sort.collect do |v|
-            [escape(key), escape(v)] * "%3D"
+          values.sort_by(&:to_s).collect do |v|
+            [escape(key), escape(v)] * "="
           end
         else
-          [escape(key), escape(values)] * "%3D"
+          [escape(key), escape(values)] * "="
         end
-      end * "%26"
+      end * "&"
     end
   extend self
 end
