@@ -21,11 +21,11 @@ module ROAuth
     oauth[:token_secret]     ||= oauth.delete(:access_secret)
 
     sig_params = oauth_params(oauth)
-    sig_params[:oauth_signature] = escape(
-      signature(oauth, uri, sig_params.merge(params), http_method)
-      )
+    sig_params[:oauth_signature] = signature(oauth, uri, sig_params.merge(params), http_method)
     sorted_sig_params    = sig_params.sort_by{|k,v| [k.to_s, v.to_s] }
-    authorization_params = sorted_sig_params.map {|key, value| [key, "\"#{value}\""].join("=") }.join(", ")
+    authorization_params = sorted_sig_params.map {|key, value| 
+      [escape(key), "\"#{escape(value)}\""].join("=") 
+    }.join(", ")
 
     %{OAuth } + authorization_params
   end
@@ -67,7 +67,7 @@ module ROAuth
         OAUTH_PARAMS.include?(key)
       }
       oauth.inject({}) {|hash, (key, value)|
-        hash["oauth_#{key}"] = escape(value)
+        hash["oauth_#{key}"] = value
         hash
       }
     end
